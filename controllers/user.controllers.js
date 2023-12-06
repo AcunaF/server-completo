@@ -1,27 +1,35 @@
 const Usuario = require("../models/usuario");
+
 const bcryptjs = require("bcryptjs");
 
 const getUser = async (req, res) => {
-  const query = req.query;
-  const { nombre, apellido, edad } = req.body;
+  const { limite = 5, desde = 0 } = req.query;
+  const user = await Usuario.find().skip(Number(desde)).limit(Number(limite));
 
   res.json({
-    msg: "get API controlador",
-
-    nombre,
-    apellido,
-    edad,
+    user,
   });
-  console.log(query);
 };
 
 const editUser = async (req, res) => {
-  const id = req.params.id;
+  const { id } = req.params;
+  const { _id, password, google, ...resto } = req.body;
 
-  res.json({
-    msg: "put API controlador",
-    id,
-  });
+  try {
+    // TODO validar contra base de datos
+    if (password) {
+      // Encriptar la contraseña
+      const salt = bcryptjs.genSaltSync(10);
+      resto.password = bcryptjs.hashSync(password, salt);
+    }
+
+    const usuariodb = await Usuario.findByIdAndUpdate(id, resto);
+
+    res.json(usuariodb);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: "Error al actualizar el usuario" });
+  }
 };
 
 const addUser = async (req, res) => {
@@ -59,10 +67,6 @@ const addUser = async (req, res) => {
       res.status(500).json({ mensaje: "Error al crear el usuario" });
     }
   }
-};
-
-module.exports = {
-  addUser,
 };
 
 const deleteUser = async (req, res) => {
