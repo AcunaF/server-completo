@@ -6,7 +6,10 @@ const getUser = async (req, res) => {
   const { limite = 5, desde = 0 } = req.query;
   const user = await Usuario.find().skip(Number(desde)).limit(Number(limite));
 
+  const total = await Usuario.countDocuments();
+
   res.json({
+    total,
     user,
   });
 };
