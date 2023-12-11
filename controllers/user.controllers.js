@@ -4,14 +4,23 @@ const bcryptjs = require("bcryptjs");
 
 const getUser = async (req, res) => {
   const { limite = 5, desde = 0 } = req.query;
-  const user = await Usuario.find().skip(Number(desde)).limit(Number(limite));
+  const query = { estado: true };
 
-  const total = await Usuario.countDocuments();
+  try {
+    const [totalUsuarios, usuarios] = await Promise.all([
+      Usuario.countDocuments(query),
+      Usuario.find(query).skip(Number(desde)).limit(Number(limite)),
+    ]);
 
-  res.json({
-    total,
-    user,
-  });
+    res.json({
+      totalUsuarios,
+      usuarios,
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: "Error en el servidor",
+    });
+  }
 };
 
 const editUser = async (req, res) => {
@@ -73,12 +82,23 @@ const addUser = async (req, res) => {
 };
 
 const deleteUser = async (req, res) => {
-  const id = req.params.id;
+  try {
+    const { id } = req.params;
+    //  const usuario = await Usuario.findByIdAndDelete(id); elimina el usuario de la base de datos
+    const usuario = await Usuario.findByIdAndUpdate(id, { estado: false }); // cambia el estado del usuario a false
 
-  res.json({
-    msg: "delete API controlador",
-    id,
-  });
+    if (!usuario) {
+      return res.status(404).json({ msg: "Usuario no encontrado" });
+    }
+
+    res.json({
+      msg: "Usuario eliminado con éxito",
+      usuario,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ msg: "Error en el servidor" });
+  }
 };
 
 module.exports = {
