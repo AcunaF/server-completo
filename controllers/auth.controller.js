@@ -6,43 +6,50 @@ const login = async (req, res = response) => {
   const { correo, password } = req.body;
 
   try {
-    // Verificar si el email existe
+    // Verificar si el email existe y obtener el usuario
     const usuario = await Usuario.findOne({ correo: correo.toLowerCase() });
 
     if (!usuario) {
       return res.status(400).json({
-        msg: "Email / Password no son correctos - correo",
+        msg: "Email o contraseña incorrectos",
       });
     }
 
     // Verificar si el usuario está activo
-
     if (!usuario.estado) {
       return res.status(400).json({
-        msg: "Email / Password no son correctos - estado: false",
+        msg: "La cuenta no está activa",
       });
     }
 
     // Verificar la contraseña
     const validPassword = bcryptjs.compareSync(password, usuario.password);
 
-    if (!validPassword) {
+    if (validPassword) {
+      console.log("validPassword", validPassword);
+      console.log("pass bdd", password);
       return res.status(400).json({
-        msg: "Email / Password no son correctos - password",
+        msg: "Email o contraseña incorrectos",
       });
     }
 
-    // Generar el JWT
+    // Generar el JWT (aquí debes implementar la lógica para generar el token)
+
+    // Otra mejora podría ser usar un middleware para la generación del JWT
 
     res.json({
-      msg: "login ok",
-      correo,
-      password,
+      msg: "Inicio de sesión exitoso",
+      usuario: {
+        id: usuario._id,
+        correo: usuario.correo,
+        // Puedes incluir más datos del usuario según tus necesidades
+      },
+      // token: generación del token aquí
     });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({
-      msg: "Hable con el administrador",
+      msg: "Error del servidor, hable con el administrador",
     });
   }
 };
