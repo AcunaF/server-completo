@@ -4,6 +4,7 @@ const bcryptjs = require("bcryptjs");
 
 const getUser = async (req, res) => {
   //const { limite = 5, desde = 0 } = req.query;
+
   const query = { estado: true };
 
   try {
@@ -31,6 +32,7 @@ const editUser = async (req, res) => {
 
   try {
     // TODO validar contra base de datos
+
     if (password) {
       // Encriptar la contraseña
       const salt = bcryptjs.genSaltSync(10);
@@ -88,6 +90,7 @@ const deleteUser = async (req, res) => {
     const { id } = req.params;
     //  const usuario = await Usuario.findByIdAndDelete(id); elimina el usuario de la base de datos
     const usuario = await Usuario.findByIdAndUpdate(id, { estado: false }); // cambia el estado del usuario a false
+    const usuarioAutenticado = req.usuario;
 
     if (!usuario) {
       return res.status(404).json({ msg: "Usuario no encontrado" });
@@ -96,6 +99,7 @@ const deleteUser = async (req, res) => {
     res.json({
       msg: "Usuario eliminado con éxito",
       usuario,
+      usuarioAutenticado,
     });
   } catch (error) {
     console.error(error);
