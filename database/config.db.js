@@ -8,6 +8,7 @@ const dbConnection = async () => {
     });
     console.log("Connected to the database");
   } catch (error) {
+    scrollbars;
     console.error(error);
     throw new Error("Error connecting to the database");
   }

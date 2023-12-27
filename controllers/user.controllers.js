@@ -88,7 +88,7 @@ const addUser = async (req, res) => {
 const deleteUser = async (req, res) => {
   try {
     const { id } = req.params;
-    //  const usuario = await Usuario.findByIdAndDelete(id); elimina el usuario de la base de datos
+
     const usuario = await Usuario.findByIdAndUpdate(id, { estado: false }); // cambia el estado del usuario a false
     const usuarioAutenticado = req.usuario;
 

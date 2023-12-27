@@ -35,7 +35,7 @@ const login = async (req, res = response) => {
       });
     }
     const token = await generateJwt(usuario.id);
-
+console.log('token : ',token)
     res.json({
       msg: "Inicio de sesión exitoso",
       usuario: {
@@ -46,6 +46,7 @@ const login = async (req, res = response) => {
       },
       token,
     });
+    console.log(usuario)
   } catch (error) {
     console.error(error);
     res.status(500).json({
